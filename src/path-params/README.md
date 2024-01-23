@@ -15,16 +15,9 @@
  ```ts
  import { GeneratePathVariablePattern, PathValue } from "./types";
 
-type ReplaceAll<Value extends string, From extends string, To extends string> =
-  Value extends `${infer Head}${From}${infer Tail}`
-  ? `${Head}${To}${ReplaceAll<Tail, From, To>}`
-  : Value
-
 const PATH_VARIABLE_PATTERN = ':';
 export type PathVariables<Path extends string> = GeneratePathVariablePattern<Path, typeof PATH_VARIABLE_PATTERN>;
-export type Serialized<Path extends string> = keyof PathVariables<Path> extends string
-  ? ReplaceAll<Path, `${typeof PATH_VARIABLE_PATTERN}${keyof PathVariables<Path>}`, string>
-  : string;
+
 function serialize<Path extends string>(path: Path, variables: PathVariables<Path>) {
   return Object.entries(variables).reduce((acc, [key, variable]) => {
     const regexp = new RegExp(`${PATH_VARIABLE_PATTERN}${key}`, 'g');
@@ -41,6 +34,17 @@ export const pathParams = {
    */
   serialize,
 };
+
+// 굳이 없어도 됨
+type ReplaceAll<Value extends string, From extends string, To extends string> =
+  Value extends `${infer Head}${From}${infer Tail}`
+  ? `${Head}${To}${ReplaceAll<Tail, From, To>}`
+  : Value
+export type Serialized<Path extends string> = keyof PathVariables<Path> extends string
+  ? ReplaceAll<Path, `${typeof PATH_VARIABLE_PATTERN}${keyof PathVariables<Path>}`, string>
+  : string;
+
+
  ```
  ### Multiple Example
  ```tsx
@@ -52,7 +56,7 @@ type MergePathVariablePatterns<
   Patterns extends ReadonlyArray<Pattern>
 > = Patterns extends [infer First extends Pattern, ...infer Rest extends ReadonlyArray<Pattern>]
   ? GeneratePathVariablePattern<Path, First[0], First[1] extends string ? First[1] : ''> & MergePathVariablePatterns<Path, Rest>
-  : Record<never, never>
+  : Record<never, never>;
 
 export function generatePathParamPattern<Patterns extends ReadonlyArray<Pattern>>(...patterns: Patterns) {
   function serialize<const Path extends string>(
