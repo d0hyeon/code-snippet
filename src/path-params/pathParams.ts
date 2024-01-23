@@ -33,5 +33,5 @@ export function createPattern<Prefix extends string, Postfix extends string>(
   prefix: Prefix,
   postfix: Postfix
 ): readonly [Prefix, Postfix] {
-  return [prefix, postfix ?? '/'] as const;
+  return [prefix, postfix] as const;
 }
