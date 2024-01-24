@@ -60,6 +60,13 @@ function generatePathParamPattern<Patterns extends ReadonlyArray<Pattern>>(...pa
   return { serialize }
 };
 
+function createPattern<Prefix extends string, Postfix extends string>(
+  prefix: Prefix,
+  postfix: Postfix
+): readonly [Prefix, Postfix] {
+  return [prefix, postfix] as const;
+};
+
 const DYNAMIC_PATH_PATTERN = {
   DEFAULT: createPattern(':', ''),
   FOR_NEXT_ROUTE: createPattern('[', ']')
