@@ -73,15 +73,7 @@ export function createQueryFragment<Item extends Record<any, any>>({
 
   function connectFragment(data: Item[]): Item[] {
     const newData = data.reduce((acc, item) => {
-      if (key instanceof Function) {
-        const keyValue = key(item);
-        acc.keys.push(keyValue);
-        acc.data[keyValue] = item;
-
-        return acc;
-      }
-
-      const keyValue = item[key];
+      const keyValue = key instanceof Function ? key(item) : item[key];
       acc.keys.push(keyValue);
       acc.data[keyValue] = item;
 
