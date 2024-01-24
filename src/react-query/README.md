@@ -16,6 +16,8 @@ const [useUserFragment, connectUserFragment] = createQueryFragment<User>({
 })
 
 function App () {
+  // 아래의 users는 useUserFragment의 데이터와 동일하며, 실제 메모리 주소값도 동일합니다.
+  // connectUserFragment를 통해 Fragment와 Query를 동기화합니다.
   const { data: users } = useSuspenseQuery({
     query: ['/user', filterValues],
     queryFn: () => getUsers(...filterValues),
