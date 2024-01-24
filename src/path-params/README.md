@@ -58,13 +58,17 @@ function generatePathParamPattern<Patterns extends ReadonlyArray<Pattern>>(...pa
   }
 
   return { serialize }
-}
+};
 
 const DYNAMIC_PATH_PATTERN = {
   DEFAULT: createPattern(':', ''),
   FOR_NEXT_ROUTE: createPattern('[', ']')
-}
-export const pathParams = generatePathParamPattern(DYNAMIC_PATH_PATTERN.DEFAULT, DYNAMIC_PATH_PATTERN.FOR_NEXT_ROUTE);
+};
+
+const pathParams = generatePathParamPattern(
+  DYNAMIC_PATH_PATTERN.DEFAULT,
+  DYNAMIC_PATH_PATTERN.FOR_NEXT_ROUTE
+);
 
 const apiRoute = pathParams.serialize('/api/users/:userId', { userId: 1 }); // '/api/users/1'
 const pageRoute = pathParams.serialize('/users/[userId]', { userId: 1 }); // '/users/1'
