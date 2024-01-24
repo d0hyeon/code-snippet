@@ -5,6 +5,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@tanstack/react-query": "^5.17.19",
     "@types/next": "^9.0.0",
     "@types/react": "^18.2.48",
     "next": "^14.1.0",
