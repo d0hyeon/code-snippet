@@ -15,36 +15,17 @@
  ```ts
  import { GeneratePathVariablePattern, PathValue } from "./types";
 
-const PATH_VARIABLE_PATTERN = ':';
-export type PathVariables<Path extends string> = GeneratePathVariablePattern<Path, typeof PATH_VARIABLE_PATTERN>;
-
-function serialize<Path extends string>(path: Path, variables: PathVariables<Path>) {
-  return Object.entries(variables).reduce((acc, [key, variable]) => {
-    const regexp = new RegExp(`${PATH_VARIABLE_PATTERN}${key}`, 'g');
-
-    return acc.replace(regexp, (variable as PathValue).toString());
-  }, path as string) as Serialized<Path>;
-}
-
-export const pathParams = {
-  /**
-   * @example
-   * pathParams.serialize('/search/:keyword', { keyword: 'name' });
-   *  => '/search/name'
-   */
-  serialize,
+type PathVariables<Path extends string> = GeneratePathVariablePattern<Path, ':'>;
+const pathParams = {
+  serialize: <Path extends string>(path: Path, variables: PathVariables<Path>) => {
+    return Object.entries(variables).reduce((acc, [key, value]) => {
+      const regexp = new RegExp(`:${key}`, 'g');
+      return acc.replace(regexp, (value as PathValue).toString());
+    }, path as string);
+  },
 };
 
-// 굳이 없어도 됨
-type ReplaceAll<Value extends string, From extends string, To extends string> =
-  Value extends `${infer Head}${From}${infer Tail}`
-  ? `${Head}${To}${ReplaceAll<Tail, From, To>}`
-  : Value
-export type Serialized<Path extends string> = keyof PathVariables<Path> extends string
-  ? ReplaceAll<Path, `${typeof PATH_VARIABLE_PATTERN}${keyof PathVariables<Path>}`, string>
-  : string;
-
-
+const route = pathParams.serialize('/users/:userId', { userId: 1 }); // '/users/1'
  ```
  ### Multiple Example
  ```tsx
@@ -54,11 +35,11 @@ type Pattern = Readonly<[string, string]>;
 type MergePathVariablePatterns<
   Path extends string,
   Patterns extends ReadonlyArray<Pattern>
-> = Patterns extends [infer First extends Pattern, ...infer Rest extends ReadonlyArray<Pattern>]
-  ? GeneratePathVariablePattern<Path, First[0], First[1] extends string ? First[1] : ''> & MergePathVariablePatterns<Path, Rest>
+> = Patterns extends [infer Item extends Pattern, ...infer Rest extends ReadonlyArray<Pattern>]
+  ? GeneratePathVariablePattern<Path, Item[0], Item[1] extends string ? Item[1] : ''> & MergePathVariablePatterns<Path, Rest>
   : Record<never, never>;
 
-export function generatePathParamPattern<Patterns extends ReadonlyArray<Pattern>>(...patterns: Patterns) {
+function generatePathParamPattern<Patterns extends ReadonlyArray<Pattern>>(...patterns: Patterns) {
   function serialize<const Path extends string>(
     path: Path,
     variables: MergePathVariablePatterns<Path, Patterns>
@@ -78,4 +59,13 @@ export function generatePathParamPattern<Patterns extends ReadonlyArray<Pattern>
 
   return { serialize }
 }
+
+const DYNAMIC_PATH_PATTERN = {
+  DEFAULT: createPattern(':', ''),
+  FOR_NEXT_ROUTE: createPattern('[', ']')
+}
+export const pathParams = generatePathParamPattern(DYNAMIC_PATH_PATTERN.DEFAULT, DYNAMIC_PATH_PATTERN.FOR_NEXT_ROUTE);
+
+const apiRoute = pathParams.serialize('/api/users/:userId', { userId: 1 }); // '/api/users/1'
+const pageRoute = pathParams.serialize('/users/[userId]', { userId: 1 }); // '/users/1'
 ```
