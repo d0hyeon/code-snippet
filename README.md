@@ -8,3 +8,4 @@
 - [WorkerBuilder](./src/worker-builder)
 - [react-query](./src/react-query)
 - [ues-performance-state](./src/use-performance-state)
+- [ues-storage-state](./src/use-storage-state)
