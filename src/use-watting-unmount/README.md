@@ -9,8 +9,9 @@
 
 function Component() {
   const router = useRouter() // next.js App Dir
-  const waitForNextRouteComplete = useWattingUnmount();
+
   const [isPending, startTransition] = useTransition();
+  const waitForNextRouteComplete = useWattingUnmount();
 
   return (
     <>
@@ -21,7 +22,8 @@ function Component() {
         onClick={() => {
           startTransition(async () => {
             await sendData('...');
-            // 아래 함수가 없을 경우, 네트워크 지연이 발생하는 상황에서 페이지 전환이 되기 전에 CTA의 disabled가 풀려 여러번 클릭을 할 수 있습니다.
+            // 아래 함수가 없을 경우, 네트워크 지연이 발생하는 상황에서
+            // 페이지 전환이 되기 전에 CTA의 disabled가 풀려 여러번 클릭을 할 수 있습니다.
             await waitForNextRouteComplete();
           })
         }}
