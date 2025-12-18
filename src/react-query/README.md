@@ -1,40 +1,47 @@
 # react-query
 
-## createQueryFragment 
-동일한 엔티티 리스트가 서로 독립된 쿼리 키로 분리되는 경우 엔티티간의 동기화 이슈가 발생할 수 있습니다. 
-이러한 문제를 해결하며 엔티티를 Fragment라는 공통된 공간에 위치시키고 각 독립된 쿼리는 이 Fragment를 참조하여 사용합니다.
+## createQueryFragment
+
+두개 이상의 데이터를 가진 리스트에서 하나의 항목에 변경이 발생할 때 전체가 리렌더 되는데,  
+변경된 항목만 리렌더가 발생되어야 할때 유용합니다.  
+리스트와 각 항목의 쿼리를 분리하여 관리합니다.
 
 ### Example
+
 ```tsx
+type User = { id: string; name: string; like: boolean };
 
-type User = { id: string; name: string; like: boolean; };
+const [useUserList, useUserItem] = createQueryFragment<User>({
+  queryKey: ["/user"],
+  queryFn: async () => (await fetch("...")).json(),
+  accessorId: "id",
+});
 
-const [useUserFragment, connectUserFragment] = createQueryFragment<User>({
-  key: 'id',
-  baseQueryKey: ['/user'],
-  queryClient,
-})
-
-function App () {
-  // 아래의 users는 useUserFragment의 데이터와 동일하며, 실제 메모리 주소값도 동일합니다.
-  // connectUserFragment를 통해 Fragment와 Query를 동기화합니다.
-  const { data: users } = useSuspenseQuery({
-    query: ['/user', filterValues],
-    queryFn: () => getUsers(...filterValues),
-    select: connectUserFragment
-  });
-
-  const { data: userById, setData: setUser } = useUserFragment();
-  
-  const likeUser = (id: string) => {
-    const nextUser = { ...userById[id], like: true };
-    
-    setUser(prev => ({ ...prev, [id]: nextUser }))
-  }
+function ListPage() {
+  // 이 페이지는 두번 다시 렌더링 되지 않습니다.
+  const { data: users } = useUserList();
 
   return (
-    ...
-  )
+    <div>
+      {users.map((x) => (
+        <UserDetail key={x.id} id={x.id} />
+      ))}
+    </div>
+  );
 }
 
+function UserDetail(props) {
+  const { data: user, update } = useUserItem(props.id);
+
+  return (
+    <div>
+      <Input
+        value={user.name}
+        onChange={(event) => {
+          update({ ...user, name: event.target.value });
+        }}
+      />
+    </div>
+  );
+}
 ```
