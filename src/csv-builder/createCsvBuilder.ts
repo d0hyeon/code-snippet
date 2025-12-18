@@ -14,7 +14,7 @@ export function createCsvBuilder<const T extends string>(headers: T[] | readonly
     const commit = () => {
       body.push(row.join(', '));
 
-      return { buildRow, addRow, toString: toText, toFile };
+      return { buildRow, addRow, toString, toFile };
     };
 
     return { addColumn, commit };
