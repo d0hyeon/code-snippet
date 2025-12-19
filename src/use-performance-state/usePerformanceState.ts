@@ -22,9 +22,9 @@ export function usePerformanceState<T extends Record<string | number, any>>(init
   const setTrackedState = useCallback((next: SetStateAction<T | undefined>) => {
     const nextValue = typeof next === 'function' ? next(prevStateRef.current) : next;
 
-    prevStateRef.current = nextValue;
     if (nextValue == null) {
       accessedKeys.current = new Set();
+      prevStateRef.current = nextValue;
       setState(nextValue);
       return;
     }
@@ -33,7 +33,8 @@ export function usePerformanceState<T extends Record<string | number, any>>(init
     const shouldUpdate = nextKeys
       .filter(key => accessedKeys.current.has(key))
       .some(key => prevStateRef.current?.[key] !== nextValue[key]);
-    
+
+    prevStateRef.current = nextValue;
     if (shouldUpdate) {
       setState(nextValue);
     }
