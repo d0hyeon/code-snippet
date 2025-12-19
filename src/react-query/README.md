@@ -31,7 +31,7 @@ function ListPage() {
 }
 
 function UserDetail(props) {
-  const { data: user, update } = useUserItem(props.id);
+  const { data: user, update, refetch } = useUserItem(props.id);
 
   return (
     <div>
@@ -39,6 +39,7 @@ function UserDetail(props) {
         value={user.name}
         onChange={(event) => {
           update({ ...user, name: event.target.value });
+          refetch();
         }}
       />
     </div>
