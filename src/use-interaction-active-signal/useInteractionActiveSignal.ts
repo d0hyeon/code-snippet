@@ -6,21 +6,21 @@ type Options = {
   once?: boolean
 }
 
-type SensitivityPreset = 'low' | 'medium' | 'high'
+type sensitivityPreset = 'low' | 'medium' | 'high'
 
 type PresetOptions = {
-  sensitivity?: SensitivityPreset
+  sensitivity?: sensitivityPreset
   once?: boolean
 }
 
-const PRESETS: Record<SensitivityPreset, { sensitivity: number; duration: number }> = {
+const PRESETS: Record<sensitivityPreset, { sensitivity: number; duration: number }> = {
   low: { sensitivity: 6, duration: 10000 },
   medium: { sensitivity: 4, duration: 8000 },
   high: { sensitivity: 2, duration: 5000 }
 }
 
 
-export function useInterectionActiveSignal(
+export function useInteractionActiveSignal(
   callback: () => void,
   options: Options | PresetOptions = { once: false, sensitivity: 'medium' }
 ) {

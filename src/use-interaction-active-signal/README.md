@@ -1,4 +1,4 @@
-# useInterectionActiveSignal
+# useInteractionActiveSignal
 
 사용자 인터렉션을 기반으로 활성 상태에 진입할때 콜백 함수가 실행됩니다.
 
@@ -10,11 +10,11 @@ const SomethingModule = lazy(() => import("..."));
 export default function Page() {
   const currentTab = useTabValue();
 
-  useInterectionActiveSignal(
+  useInteractionActiveSignal(
     () => {
       SomethingModule.preload();
     },
-    { sensivility: "high" },
+    { sensitivity: "high" },
   );
 
   return (
