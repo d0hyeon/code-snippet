@@ -31,20 +31,21 @@ export function useInterectionActiveSignal(
       ? PRESETS[options.sensitivity]
       : { ...PRESETS.medium, ...(options as Options) }
 
+  
   const timestampsRef = useRef<number[]>([]);
-
-  const resetMeasurement = useCallback(() => { 
-    timestampsRef.current = [];
-  }, [])
-
   const measure = useCallback(() => {
     const now = Date.now()
-    const last = timestampsRef.current.at(-1)
+    const last = timestampsRef.current.at(-1);
+
+    const reset = () => {
+      timestampsRef.current = [];
+    }
 
     if (last != null && now - last < 20) {
       /* @NOTE 20밀리초 이하는 중복 이벤트로 간주 */
-      return timestampsRef.current;
+      return { measurements: timestampsRef.current, reset };
     }
+
     timestampsRef.current.push(now)
     while (
       timestampsRef.current.length &&
@@ -52,7 +53,8 @@ export function useInterectionActiveSignal(
     ) {
       timestampsRef.current.shift()
     }
-    return timestampsRef.current;
+    
+    return { measurements: timestampsRef.current, reset };
   }, [duration])
 
 
@@ -66,10 +68,10 @@ export function useInterectionActiveSignal(
     }
 
     const handler = () => {
-      const measurements = measure();
+      const { measurements, reset } = measure();
       if (measurements.length >= sensitivity) {
         callback();
-        resetMeasurement();
+        reset();
 
         if (once) {
           unsubscribe();
