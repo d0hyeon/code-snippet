@@ -25,6 +25,6 @@ export default function Page() {
 }
 ```
 
-## lazy
+### lazy
 
 React.lazy의 확장된 모듈로, preload 메서드를 제공합니다.
