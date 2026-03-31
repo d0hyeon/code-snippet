@@ -8,7 +8,7 @@
 const SomethingModule = lazy(() => import("..."));
 
 export default function Page() {
-  const currentTab = useCurrentTabValue();
+  const currentTab = useTabValue();
 
   useInterectionActiveSignal(
     () => {
