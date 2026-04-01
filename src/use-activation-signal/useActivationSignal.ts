@@ -20,7 +20,7 @@ const PRESETS: Record<sensitivityPreset, { sensitivity: number; duration: number
 }
 
 
-export function useInteractionActiveSignal(
+export function useActivationSignal(
   callback: () => void,
   options: Options | PresetOptions = { once: false, sensitivity: 'medium' }
 ) {

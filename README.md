@@ -12,4 +12,4 @@
 - [use-watting-unmount](./src/use-watting-unmount)
 - [csv-builder](./src/csv-builder)
 - [use-scroll-restore](./src/use-scroll-restore)
-- [use-interaction-active-signal](./src/use-interaction-active-signal)
+- [use-activation-signal](./src/use-activation-signal)
