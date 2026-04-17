@@ -24,6 +24,14 @@ function ListPage() {
     queryFn: () => fetch(,,,)
   });
 
+  const queryClient = useQueryClient();
+  useSocket('updated-user', (updated) => {
+    queryClient.setQueryData(
+      userEntity.getKey(updated.id),
+      (curr) => ({ ...curr, ...updated })
+    );
+  })
+
   return (
     <Table>
       {users.map((x) => (
