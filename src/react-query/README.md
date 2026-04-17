@@ -1,48 +1,58 @@
 # react-query
 
-## createQueryFragment
+## createEntity
 
-리스트 형태를 가진 데이터에서 세부 항목에 변경이 발생할 때 전체가 리렌더 되는데, 
-변경된 항목만 리렌더가 발생되어야 할때 사용할 수 있습니다.  
-리스트와 각 항목의 쿼리를 분리하여 관리합니다.
+1. 동일한 엔티티에 서로 다른 캐시 키로 관리 될 경우 동기화 문제가 발생합니다.
+2. 리스트 + 단건 업데이트 구조에서, 업데이트 시 모든 row의 리렌더가 발생합니다.
+
+위 두가지 문제를 해결하고자 직렬화를 수행합니다.
 
 ### Example
 
 ```tsx
-type User = { id: string; name: string; like: boolean };
+type User = { id: string; name: string; };
 
-const [useUserList, useUserItem] = createQueryFragment<User>({
-  queryKey: ["/user"],
-  queryFn: async () => (await fetch("...")).json(),
-  accessorId: "id",
-});
+const userEntity = createEntity<User>()({
+  name: 'user',
+  selectId: user => user.id
+})
+const { useEntityIdsQuery } = createEntityListQuery(userEntity)
 
 function ListPage() {
-  // 이 페이지는 두번 다시 렌더링 되지 않습니다.
-  const { data: users } = useUserList();
+  const { data: userIds } = useEntityIdsQuery({
+    queryKey: ['user-all'],
+    queryFn: () => fetch(,,,)
+  });
 
   return (
-    <div>
+    <Table>
       {users.map((x) => (
-        <UserDetail key={x.id} id={x.id} />
+        <UserTableRow key={x.id} id={x.id} />
       ))}
-    </div>
+    </Table>
   );
 }
 
-function UserDetail(props) {
-  const { data: user, update, refetch } = useUserItem(props.id);
+const { useEntityQuery } = createEntityQuery(userEntity);
+
+function UserTableRow(props) {
+  const { data: user, refetch } = useEntityQuery({
+    entityId: props.id,
+    queryFn: () => fetch(...)
+  });
 
   return (
-    <div>
-      <Input
-        value={user.name}
-        onChange={(event) => {
-          update({ ...user, name: event.target.value });
-          refetch();
-        }}
-      />
-    </div>
+    <tr>
+      <td>
+        <Input
+          value={user.name}
+          onChange={(event) => {
+            api.updateName(event.target.value);
+            refetch() // 동일한 entityId를 구독하는 컴포넌트만 리렌더링 됩니다.
+          }}
+        />
+      </td>
+    </tr>
   );
 }
 ```
